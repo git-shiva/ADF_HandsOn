@@ -1,0 +1,147 @@
+{
+	"name": "Assgnmnt7_8",
+	"properties": {
+		"activities": [
+			{
+				"name": "Fail_load_Emp_adls_csv",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": "truncate table saleslt.employeedata;",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false,
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "adls_generic_csv_ds",
+						"type": "DatasetReference",
+						"parameters": {
+							"FolderName": "CSV",
+							"FileName": "EmployeeData.csv"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "SQLDB_generic_DS",
+						"type": "DatasetReference",
+						"parameters": {
+							"Schema": "saleslt",
+							"Tablename": {
+								"value": "Customer",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "Emp_adls_csv_copy",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Fail_load_Emp_adls_csv",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": "truncate table saleslt.employeedata;",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false,
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "adls_generic_csv_ds",
+						"type": "DatasetReference",
+						"parameters": {
+							"FolderName": "CSV",
+							"FileName": "EmployeeData.csv"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "SQLDB_generic_DS",
+						"type": "DatasetReference",
+						"parameters": {
+							"Schema": "saleslt",
+							"Tablename": {
+								"value": "EmployeeData",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2025-07-25T02:40:41Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

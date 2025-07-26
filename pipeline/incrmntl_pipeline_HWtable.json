@@ -1,0 +1,194 @@
+{
+	"name": "incrmntl_pipeline_HWtable",
+	"properties": {
+		"activities": [
+			{
+				"name": "lkp_highWatermarkdate",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "select max(lastrundatetime) as lastrundatetime from saleslt.high_watermark;",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "SQLDB_generic_DS",
+						"type": "DatasetReference",
+						"parameters": {
+							"Schema": "saleslt",
+							"Tablename": "high_watermark"
+						}
+					}
+				}
+			},
+			{
+				"name": "cpy_incrmntldata",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "lkp_cust_modifieddate",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "select * from saleslt.employeedata where creationdate > '@{activity('lkp_highWatermarkdate').output.firstRow.lastrundatetime }' and creationdate <= '@{activity('lkp_cust_modifieddate').output.firstRow.recrd_date}'",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false,
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "Address_SQLDB_DS",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "SQLDB_generic_DS",
+						"type": "DatasetReference",
+						"parameters": {
+							"Schema": "saleslt",
+							"Tablename": "cust_incrmntl_data"
+						}
+					}
+				]
+			},
+			{
+				"name": "lkp_cust_modifieddate",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "lkp_highWatermarkdate",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "select max(ModifiedDate) as recrd_date from saleslt.customer",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "sql_cust_DS",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "updt_HWM",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "cpy_incrmntldata",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "select '@{activity('lkp_cust_modifieddate').output.firstRow.recrd_date}' as lastrundatetime",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "Sql_DB_DS",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "SQLDB_generic_DS",
+						"type": "DatasetReference",
+						"parameters": {
+							"Schema": "saleslt",
+							"Tablename": "high_watermark"
+						}
+					}
+				]
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2025-07-24T03:33:47Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

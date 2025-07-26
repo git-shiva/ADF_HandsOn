@@ -1,0 +1,117 @@
+{
+	"name": "Foreach_Example_2",
+	"properties": {
+		"activities": [
+			{
+				"name": "lkp_total_rec_cnt",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "select count(1) as rec_cnt from saleslt.customer;",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "SQLDB_generic_DS",
+						"type": "DatasetReference",
+						"parameters": {
+							"Schema": "salesLt",
+							"Tablename": "customer"
+						}
+					}
+				}
+			},
+			{
+				"name": "check_cust_gt_100",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "lkp_total_rec_cnt",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@greater(activity('lkp_total_rec_cnt').output.firstRow.rec_cnt,100)",
+						"type": "Expression"
+					},
+					"ifTrueActivities": [
+						{
+							"name": "load_cust_copy",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"preCopyScript": "truncate table customer_copy;",
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": false,
+									"tableOption": "autoCreate",
+									"disableMetricsCollection": false
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "SQLDB_generic_DS",
+									"type": "DatasetReference",
+									"parameters": {
+										"Schema": "saleslt",
+										"Tablename": "customer"
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "SQLDB_generic_DS",
+									"type": "DatasetReference",
+									"parameters": {
+										"Schema": "saleslt",
+										"Tablename": "customer_copy"
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2025-07-18T02:39:07Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
