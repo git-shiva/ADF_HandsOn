@@ -1,0 +1,51 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "mission100tsk101294"
+		},
+		"SQL_DB_LS_password": {
+			"value": ""
+		},
+		"SQL_Generic_LS_password": {
+			"value": ""
+		},
+		"adls_csv_LS_accountKey": {
+			"value": ""
+		},
+		"adls_generic_LS_accountKey": {
+			"value": ""
+		},
+		"adls_json_LS_accountKey": {
+			"value": ""
+		},
+		"SQL_DB_LS_properties_typeProperties_server": {
+			"value": "dbasqlservergroup30.database.windows.net"
+		},
+		"SQL_DB_LS_properties_typeProperties_database": {
+			"value": "Mission100tsk101294DB"
+		},
+		"SQL_DB_LS_properties_typeProperties_userName": {
+			"value": "tskazurelib"
+		},
+		"SQL_Generic_LS_properties_typeProperties_server": {
+			"value": "dbasqlservergroup30.database.windows.net"
+		},
+		"SQL_Generic_LS_properties_typeProperties_database": {
+			"value": "Mission100tsk101294DB"
+		},
+		"SQL_Generic_LS_properties_typeProperties_userName": {
+			"value": "tskazurelib"
+		},
+		"adls_csv_LS_properties_typeProperties_url": {
+			"value": "https://tsk101294adls.dfs.core.windows.net/"
+		},
+		"adls_generic_LS_properties_typeProperties_url": {
+			"value": "https://tsk101294adls.dfs.core.windows.net/"
+		},
+		"adls_json_LS_properties_typeProperties_url": {
+			"value": "https://tsk101294adls.dfs.core.windows.net/"
+		}
+	}
+}

@@ -1,0 +1,160 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "mission100tsk101294"
+		},
+		"SQL_DB_LS_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'SQL_DB_LS'"
+		},
+		"SQL_Generic_LS_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'SQL_Generic_LS'"
+		},
+		"adls_csv_LS_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'adls_csv_LS'"
+		},
+		"adls_generic_LS_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'adls_generic_LS'"
+		},
+		"adls_json_LS_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'adls_json_LS'"
+		},
+		"SQL_DB_LS_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "dbasqlservergroup30.database.windows.net"
+		},
+		"SQL_DB_LS_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "Mission100tsk101294DB"
+		},
+		"SQL_DB_LS_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "tskazurelib"
+		},
+		"SQL_Generic_LS_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "dbasqlservergroup30.database.windows.net"
+		},
+		"SQL_Generic_LS_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "Mission100tsk101294DB"
+		},
+		"SQL_Generic_LS_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "tskazurelib"
+		},
+		"adls_csv_LS_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://tsk101294adls.dfs.core.windows.net/"
+		},
+		"adls_generic_LS_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://tsk101294adls.dfs.core.windows.net/"
+		},
+		"adls_json_LS_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://tsk101294adls.dfs.core.windows.net/"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "mission100tsk101294_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"SQL_DB_LS_password": {
+						"value": "[parameters('SQL_DB_LS_password')]"
+					},
+					"SQL_Generic_LS_password": {
+						"value": "[parameters('SQL_Generic_LS_password')]"
+					},
+					"adls_csv_LS_accountKey": {
+						"value": "[parameters('adls_csv_LS_accountKey')]"
+					},
+					"adls_generic_LS_accountKey": {
+						"value": "[parameters('adls_generic_LS_accountKey')]"
+					},
+					"adls_json_LS_accountKey": {
+						"value": "[parameters('adls_json_LS_accountKey')]"
+					},
+					"SQL_DB_LS_properties_typeProperties_server": {
+						"value": "[parameters('SQL_DB_LS_properties_typeProperties_server')]"
+					},
+					"SQL_DB_LS_properties_typeProperties_database": {
+						"value": "[parameters('SQL_DB_LS_properties_typeProperties_database')]"
+					},
+					"SQL_DB_LS_properties_typeProperties_userName": {
+						"value": "[parameters('SQL_DB_LS_properties_typeProperties_userName')]"
+					},
+					"SQL_Generic_LS_properties_typeProperties_server": {
+						"value": "[parameters('SQL_Generic_LS_properties_typeProperties_server')]"
+					},
+					"SQL_Generic_LS_properties_typeProperties_database": {
+						"value": "[parameters('SQL_Generic_LS_properties_typeProperties_database')]"
+					},
+					"SQL_Generic_LS_properties_typeProperties_userName": {
+						"value": "[parameters('SQL_Generic_LS_properties_typeProperties_userName')]"
+					},
+					"adls_csv_LS_properties_typeProperties_url": {
+						"value": "[parameters('adls_csv_LS_properties_typeProperties_url')]"
+					},
+					"adls_generic_LS_properties_typeProperties_url": {
+						"value": "[parameters('adls_generic_LS_properties_typeProperties_url')]"
+					},
+					"adls_json_LS_properties_typeProperties_url": {
+						"value": "[parameters('adls_json_LS_properties_typeProperties_url')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "mission100tsk101294_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'mission100tsk101294_ArmTemplate_0')]"
+			]
+		}
+	]
+}
